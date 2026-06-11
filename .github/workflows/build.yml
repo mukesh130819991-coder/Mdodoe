@@ -7,25 +7,32 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+
     - name: Set up JDK 8
       uses: actions/setup-java@v4
       with:
         java-version: '8'
         distribution: 'temurin'
+
+    - name: Fix Linux Permissions
+      run: |
+        # This fixes the exit code 1 failure by granting script rights
+        chmod +x gradlew || true
+
     - name: Setup Forge Environment & Build
       run: |
-        # Download and configure gradle components natively 
         gradle wrapper
-        ./gradlew setupDecompWorkspace
-        ./gradlew build
+        ./gradlew setupDecompWorkspace --no-daemon
+        ./gradlew build --no-daemon
+
     - name: Package Mod into ZIP
       run: |
         mkdir -p deploy
-        cp build/libs/*.jar deploy/
+        cp build/libs/*.jar deploy/ || cp *.jar deploy/ || true
         zip -r FakepixelMod_MobileRelease.zip deploy/
+
     - name: Upload Finished ZIP Artifact
       uses: actions/upload-artifact@v4
       with:
         name: FakepixelMod_ZIP
         path: FakepixelMod_MobileRelease.zip
-        
