@@ -1,0 +1,30 @@
+name: Build Mobile Forge Mod
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+    - name: Setup Forge Environment & Build
+      run: |
+        # Download and configure gradle components natively 
+        gradle wrapper
+        ./gradlew setupDecompWorkspace
+        ./gradlew build
+    - name: Package Mod into ZIP
+      run: |
+        mkdir -p deploy
+        cp build/libs/*.jar deploy/
+        zip -r FakepixelMod_MobileRelease.zip deploy/
+    - name: Upload Finished ZIP Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: FakepixelMod_ZIP
+        path: FakepixelMod_MobileRelease.zip
