@@ -14,14 +14,14 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
 
-    - name: Fix Linux Permissions
+    - name: Force Generate Wrapper and Permissions
       run: |
-        # This fixes the exit code 1 failure by granting script rights
-        chmod +x gradlew || true
+        # This manually builds a fresh gradle environment from scratch
+        gradle wrapper --gradle-version 2.7
+        chmod +x gradlew
 
     - name: Setup Forge Environment & Build
       run: |
-        gradle wrapper
         ./gradlew setupDecompWorkspace --no-daemon
         ./gradlew build --no-daemon
 
